@@ -1,6 +1,7 @@
 #include <Arduino.h>
 //#include <math.h>
-#include "hardware\\tools\\avr\\avr\\include\\math.h"
+//#include "hardware\\tools\\avr\\avr\\include\\math.h"
+#include "hardware/tools/avr/avr/include/math.h"
 #include <Servo.h>
 
 #define S1_PIN 3
@@ -28,60 +29,6 @@
 #define CIRCLE_PRECISION 0.2
 #define BEZIER_SEGMENTS 100
 
-
-/////////////////////////////
-/*
-struct vec2 {
-    double x, y;
-    vec2(double x, double y) : x(x), y(y) {}
-};
-
-vec2 operator + (vec2 a, vec2 b) {
-    return vec2(a.x + b.x, a.y + b.y);
-}
-
-vec2 operator - (vec2 a, vec2 b) {
-    return vec2(a.x - b.x, a.y - b.y);
-}
-
-vec2 operator * (double s, vec2 a) {
-    return vec2(s * a.x, s * a.y);
-}
-
-
-
-vec2 CalculateBezierPoint(double t, vec2 p0, vec2 p1, vec2 p2, vec2 p3)
-{
-  double u = 1 - t;
-  double tt = t*t;
-  double uu = u*u;
-  double uuu = uu * u;
-  double ttt = tt * t;
- 
-  vec2 p = uuu * p0; //first term
-  p = p + 3 * uu * t * p1; //second term
-  p = p + 3 * u * tt * p2; //third term
-  p = p + ttt * p3; //fourth term
- 
-  return p;
-}
-
-void drawBezierCurve(vec2 p0, vec2 p1, vec2 p2, vec2 p3)
-{
-  vec2 q0 = CalculateBezierPoint(0, p0, p1, p2, p3);
-  vec2 q1(0, 0);
-  double t = 0;
-  
-  for(int i = 1; i <= BEZIER_SEGMENTS; i++)
-  {
-    t = i / (double) BEZIER_SEGMENTS;
-    q1 = CalculateBezierPoint(t, p0, p1, p2, p3);
-    draw_line(q0.x, q0.y, q1.x, q1.y, true);
-    q0 = q1;
-  }
-}
-*/
-/////////////////////////////
 
 Servo servo1;
 Servo servo2;
@@ -134,7 +81,7 @@ void put_down_fast()
   is_up = true;
 }
 
-void draw_line(double x1, double y1, double x2, double y2, bool without_lifting_up = false)
+void draw_line(double x1, double y1, double x2, double y2, bool without_lifting = false)
 {
   bool delayed = false;
   
@@ -143,29 +90,26 @@ void draw_line(double x1, double y1, double x2, double y2, bool without_lifting_
     
   go_to(x1, y1);
 
-  if(delayed)
-    delay(100);
   
   if(is_up)
     put_down();
   
   double dx = x2 - x1;
   double dy = y2 - y1;  
-  double c = round(STEPS_PER_MM * sqrt(dx*dx + dy*dy)); //quiza floor
+  double c = round(STEPS_PER_MM * sqrt(dx*dx + dy*dy));
   
-  for(int i = 0; i <= c; i++) //puede empezar desde 1 si ya se encuentra en el lugar
+  for(int i = 0; i <= c; i++)
   {
     go_to(x1 + i*dx/c, y1 + i*dy/c);
   }
   
-  if(!without_lifting_up)
+  if(!without_lifting)
     lift_up();
 }
 
 void draw_circle(double x, double y, double radius)
 {
   go_to(x+cos(0)*radius, y+sin(0)*radius);
-  delay(100);
   
   if(is_up)
     put_down();
@@ -202,94 +146,43 @@ inline double pitagoras(double b, double c)
 
 void go_to(double x, double y)
 {
-  
   double L4 = cosine_side_rule(M_PI - M_PI/4.0, L2, L3);
   double epsilon = cosine_angle_rule(L4, L2, L3);
   double d3 = pitagoras(S2_POS_X - x, y - S2_POS_Y);
   double theta2 = atan2(y, (S2_POS_X - x)) + cosine_angle_rule(d3, L4, L1);
-
-   /*Serial.print("M_PI: ");
-   Serial.println(M_PI);
-   Serial.print("atan2: ");
-   Serial.println(atan2(y, (S2_POS_X - x)));
-   Serial.print("cosine: ");
-   Serial.println(cosine_angle_rule(d3, L4, L1));
-
-   Serial.print("theta2: ");
-   Serial.println(M_PI - (atan2(y, (S2_POS_X - x)) + cosine_angle_rule(d3, L4, L1)));*/
-  
-  /*servo2.write(floor(rad_to_deg(M_PI - theta2)) + S2_OFFSET);
-  Serial.print("servo2: ");
-  Serial.println(floor(rad_to_deg(M_PI - theta2)));
-  //delay(10);*/
-
-  /*Serial.print("M_PI: ");
-   Serial.println(M_PI);
-  Serial.print("theta2: ");
-   Serial.println(theta2);
-  Serial.print("M_PI - theta2: ");
-  Serial.println(M_PI - theta2);*/
   
   double x4 = S2_POS_X + L1*cos(M_PI - theta2);
   double y4 = S2_POS_Y + L1*sin(M_PI - theta2);
-
-  /*Serial.print("x4: ");
-   Serial.println(x4);
-  Serial.print("y4: ");
-   Serial.println(y4);*/
   
   double delta = atan2((x4-x), (y-y4));
   
-  /*Serial.print("delta: ");
-   Serial.println(rad_to_deg(delta));
-
-   Serial.print("epsilon: ");
-   Serial.println(rad_to_deg(epsilon));
-
-   Serial.print("delta-epsilon: ");
-   Serial.println(rad_to_deg(delta-epsilon));*/
-  
   double x1 = x + L3*sin(delta-epsilon);
   double y1 = y - L3*cos(delta-epsilon);
-
-  /*Serial.print("x1: ");
-   Serial.println(x1);
-
-   Serial.print("y1: ");
-   Serial.println(y1);*/
   
   double d1 = pitagoras(x1 - S1_POS_X, y1 - S1_POS_Y);
-
-  /*Serial.print("d1: ");
-   Serial.println(d1);*/
-  
   double theta1 = atan2((y1 - S1_POS_Y), (x1 - S1_POS_X)) + cosine_angle_rule(d1, L2, L1);
 
-  /*Serial.print("atan2: ");
-   Serial.println(rad_to_deg(atan2((y1 - S1_POS_Y), (x1 - S1_POS_X))));
-
-   Serial.print("cosine: ");
-   Serial.println(rad_to_deg(cosine_angle_rule(d1, L2, L1)));
-
-   Serial.print("theta1: ");
-   Serial.println(rad_to_deg(theta1));*/
-
+  double s1deg = rad_to_deg(theta1);
+  double s2deg = rad_to_deg(M_PI - theta2);
    
-
-    servo2.write((rad_to_deg(M_PI - theta2)) + S2_OFFSET);
-  Serial.print("servo2: ");
-  Serial.println(floor(rad_to_deg(M_PI - theta2)));
-  
-  
-  servo1.write((rad_to_deg(theta1)) + S1_OFFSET);
+  servo1.write(s1deg + S1_OFFSET);
   Serial.print("servo1: ");
-  Serial.println(floor(rad_to_deg(theta1)));
+  Serial.println(floor(s1deg));
+
+  servo2.write(s2deg + S2_OFFSET);
+  Serial.print("servo2: ");
+  Serial.println(floor(s2deg));
   
+  double max_dist = max(s1deg, s2deg);
+  int delay_servo = 1.7*max_dist;
+
+  if (delay_servo < 10)
+    delay_servo = 10;
   
   actual_x = x;
   actual_y = y;
   
-  //delay(10);
+  delay(delay_servo);
 }
 
 void setup()
