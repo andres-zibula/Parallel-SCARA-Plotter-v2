@@ -6,7 +6,7 @@
 
 #define S1_PIN 3
 #define S2_PIN 4
-#define S3_PIN 5
+#define S3_PIN 2
 #define DEBUG_LED_CALC 12
 #define DEBUG_LED_LIFTED 11
 #define DEBUG_LED_LIFTING 10
@@ -31,7 +31,7 @@
 #define LIFTING_SPEED 20 //lower is faster
 
 #define STEPS_PER_MM 1
-#define CIRCLE_PRECISION 0.2
+#define CIRCLE_PRECISION 0.1
 #define MS_PER_DEG 1.7
 
 Servo servo1;
@@ -40,6 +40,8 @@ Servo servo3;
 
 double actual_x = 0;
 double actual_y = 0;
+double actual_s1_deg = 0;
+double actual_s2_deg = 0;
 bool lifted = false;
 
 void go_to(double, double);
@@ -169,6 +171,9 @@ inline double pitagoras(double b, double c)
 
 void go_to(double x, double y)
 {
+  if (actual_x == x && actual_y == y)
+    return;
+
   digitalWrite(DEBUG_LED_CALC, HIGH);
 
   double L4 = cosine_side_rule(M_PI - M_PI/4.0, ARM_LEN_2, ARM_LEN_3);
@@ -191,14 +196,14 @@ void go_to(double x, double y)
   double s2deg = rad_to_deg(M_PI - theta2);
    
   servo1.write(s1deg + S1_OFFSET);
-  Serial.print("servo1: ");
-  Serial.println(floor(s1deg));
+  //Serial.print("servo1: ");
+  //Serial.println(floor(s1deg));
 
   servo2.write(s2deg + S2_OFFSET);
-  Serial.print("servo2: ");
-  Serial.println(floor(s2deg));
+  //Serial.print("servo2: ");
+  //Serial.println(floor(s2deg));
   
-  double max_dist = max(s1deg, s2deg);
+  double max_dist = max(abs(actual_s1_deg - s1deg), abs(actual_s2_deg - s2deg));
   int delay_servo = ceil(MS_PER_DEG*ceil(max_dist));
 
   if (delay_servo < 10)
@@ -206,6 +211,8 @@ void go_to(double x, double y)
   
   actual_x = x;
   actual_y = y;
+  actual_s1_deg = s1deg;
+  actual_s2_deg = s2deg;
   
   digitalWrite(DEBUG_LED_CALC, LOW);
   delay(delay_servo);
@@ -220,7 +227,7 @@ void setup()
   pinMode(DEBUG_LED_LINE, OUTPUT);
 
   digitalWrite(DEBUG_LED_CALC, LOW);
-  digitalWrite(DEBUG_LED_LIFTED, LOW);
+  digitalWrite(DEBUG_LED_LIFTED, HIGH);
   digitalWrite(DEBUG_LED_LIFTING, LOW);
   digitalWrite(DEBUG_LED_PUTTING_DOWN, LOW);
   digitalWrite(DEBUG_LED_LINE, LOW);
@@ -230,7 +237,10 @@ void setup()
   
   servo1.attach(S1_PIN);
   servo2.attach(S2_PIN);
-  //servo3.attach(S3_PIN);
+  servo3.attach(S3_PIN);
+  servo1.write(90);
+  servo2.write(90);
+  servo3.write(90);
   
   /*servo1.write(150);
   servo2.write(30);
@@ -239,8 +249,8 @@ void setup()
   //lift_up();
   //go_to(25, 100);
 
-  servo1.write(90 + S1_OFFSET);
-  servo2.write(90 + S2_OFFSET);
+  //servo1.write(90 + S1_OFFSET);
+  //servo2.write(90 + S2_OFFSET);
 
   //delay(5000);
 
@@ -266,6 +276,15 @@ void setup()
 
   delay(100);
   go_to(25, 100);*/
+
+
+  delay(1000);
+  draw_circle(80, 151, 16);
+  delay(1000);
+  draw_circle(80, 151, 16);
+  delay(1000);
+  draw_circle(80, 151, 16);
+  delay(1000);
   
 }
 
