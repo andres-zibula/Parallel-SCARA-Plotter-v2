@@ -26,9 +26,9 @@
 #define ARM_LEN_2 100
 #define ARM_LEN_3 35
 
-#define LIFT_HEIGHT 27
-#define BASE_HEIGHT 10
-#define LIFTING_SPEED 20 //lower is faster
+#define LIFT_HEIGHT 120
+#define BASE_HEIGHT 50
+#define LIFTING_SPEED 10 //lower is faster
 
 #define STEPS_PER_MM 1
 #define CIRCLE_PRECISION 0.1
@@ -52,15 +52,13 @@ void put_down_fast();
 void draw_line(double, double, double, double, bool = false);
 void draw_circle(double, double, double);
 
-int pos = 0;
-
 void lift()
 {
   digitalWrite(DEBUG_LED_LIFTING, HIGH);
 
   for(int i = BASE_HEIGHT+1; i <= LIFT_HEIGHT; i++)
   {
-    servo3.write(i);
+    servo3.write(180 - i);
     delay(LIFTING_SPEED);
   }
   delay(50);
@@ -74,7 +72,7 @@ void lift_fast()
 {
   digitalWrite(DEBUG_LED_LIFTING, HIGH);
   
-  servo3.write(LIFT_HEIGHT);
+  servo3.write(180 - LIFT_HEIGHT);
   delay(50);
   lifted = true;
 
@@ -88,7 +86,7 @@ void put_down()
 
   for(int i = LIFT_HEIGHT-1; i >= BASE_HEIGHT; i--)
   {
-    servo3.write(i);
+    servo3.write(180 - i);
     delay(LIFTING_SPEED);
   }
   delay(100);
@@ -102,7 +100,7 @@ void put_down_fast()
 {
   digitalWrite(DEBUG_LED_PUTTING_DOWN, HIGH);
 
-  servo3.write(BASE_HEIGHT);
+  servo3.write(180 - BASE_HEIGHT);
   delay(100);
   lifted = false;
 
@@ -116,7 +114,7 @@ void draw_line(double x1, double y1, double x2, double y2, bool without_lifting)
   go_to(x1, y1);
 
   if(lifted)
-    put_down_fast();
+    put_down();
   
   double dx = x2 - x1;
   double dy = y2 - y1;  
@@ -130,7 +128,7 @@ void draw_line(double x1, double y1, double x2, double y2, bool without_lifting)
   digitalWrite(DEBUG_LED_LINE, LOW);
 
   if(!without_lifting)
-    lift_fast();
+    lift();
 }
 
 void draw_circle(double x, double y, double radius)
@@ -138,14 +136,14 @@ void draw_circle(double x, double y, double radius)
   go_to(x+cos(0)*radius, y+sin(0)*radius);
   
   if(lifted)
-    put_down_fast();
+    put_down();
   
   for(double r = CIRCLE_PRECISION; r <= M_PI*2; r += CIRCLE_PRECISION)
   {
     draw_line(actual_x, actual_y, x+cos(r)*radius, y+sin(r)*radius, true);
   }
   
-  lift_fast();
+  lift();
 }
 
 inline double cosine_angle_rule(double a, double b, double c)
@@ -278,18 +276,25 @@ void setup()
   go_to(25, 100);*/
 
 
-  delay(1000);
-  draw_circle(80, 151, 16);
-  delay(1000);
-  draw_circle(80, 151, 16);
-  delay(1000);
-  draw_circle(80, 151, 16);
-  delay(1000);
+  // delay(1000);
+  // draw_circle(80, 151, 16);
+  // delay(1000);
+  // draw_circle(80, 151, 16);
+  // delay(1000);
+  // draw_circle(80, 151, 16);
+  // delay(1000);
+
+  delay(3000);
+  lift();
+  delay(3000);
+  put_down();
   
 }
 
 void loop()
-{/*
+{
+  
+  /*
   for (pos = 0; pos <= 90; pos += 10) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
     servo1.write(pos);              // tell servo to go to position in variable 'pos'
