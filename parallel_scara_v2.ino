@@ -26,13 +26,13 @@
 #define ARM_LEN_2 100
 #define ARM_LEN_3 35
 
-#define LIFT_HEIGHT 120
-#define BASE_HEIGHT 50
-#define LIFTING_SPEED 10 //lower is faster
+#define LIFT_HEIGHT 90
+#define BASE_HEIGHT 40
+#define LIFTING_SPEED 7 //lower is faster
 
 #define STEPS_PER_MM 1
-#define CIRCLE_PRECISION 0.1
-#define MS_PER_DEG 1.7
+#define CIRCLE_PRECISION 0.05
+#define MS_PER_DEG 3.0 //1.7
 
 Servo servo1;
 Servo servo2;
@@ -61,7 +61,7 @@ void lift()
     servo3.write(180 - i);
     delay(LIFTING_SPEED);
   }
-  delay(50);
+  delay(200);
   lifted = true;
 
   digitalWrite(DEBUG_LED_LIFTED, HIGH);
@@ -73,7 +73,7 @@ void lift_fast()
   digitalWrite(DEBUG_LED_LIFTING, HIGH);
   
   servo3.write(180 - LIFT_HEIGHT);
-  delay(50);
+  delay(200);
   lifted = true;
 
   digitalWrite(DEBUG_LED_LIFTED, HIGH);
@@ -89,7 +89,7 @@ void put_down()
     servo3.write(180 - i);
     delay(LIFTING_SPEED);
   }
-  delay(100);
+  delay(200);
   lifted = false;
 
   digitalWrite(DEBUG_LED_LIFTED, LOW);
@@ -101,7 +101,7 @@ void put_down_fast()
   digitalWrite(DEBUG_LED_PUTTING_DOWN, HIGH);
 
   servo3.write(180 - BASE_HEIGHT);
-  delay(100);
+  delay(200);
   lifted = false;
 
   digitalWrite(DEBUG_LED_LIFTED, LOW);
@@ -140,7 +140,8 @@ void draw_circle(double x, double y, double radius)
   
   for(double r = CIRCLE_PRECISION; r <= M_PI*2; r += CIRCLE_PRECISION)
   {
-    draw_line(actual_x, actual_y, x+cos(r)*radius, y+sin(r)*radius, true);
+    //draw_line(actual_x, actual_y, x+cos(r)*radius, y+sin(r)*radius, true);
+    go_to(x+cos(r)*radius, y+sin(r)*radius);
   }
   
   lift();
@@ -230,8 +231,7 @@ void setup()
   digitalWrite(DEBUG_LED_PUTTING_DOWN, LOW);
   digitalWrite(DEBUG_LED_LINE, LOW);
 
-  Serial.begin(9600);
-  Serial.println("Hello world!");
+  //Serial.begin(9600);
   
   servo1.attach(S1_PIN);
   servo2.attach(S2_PIN);
@@ -240,89 +240,22 @@ void setup()
   servo2.write(90);
   servo3.write(90);
   
-  /*servo1.write(150);
-  servo2.write(30);
-  servo3.write(LIFT_UP_HEIGHT);*/
-  
-  //lift_up();
-  //go_to(25, 100);
+  draw_line(-25, 130, 75, 130);
+  draw_line(-25, 150, 75, 150);
+  draw_line(-25, 170, 75, 170);
 
-  //servo1.write(90 + S1_OFFSET);
-  //servo2.write(90 + S2_OFFSET);
+  draw_line(-25, 130, 75, 130);
+  draw_line(75, 170, -25, 170);
 
-  //delay(5000);
-
-  //triangulo
-  /*draw_line(-56, 166, -31, 142, true);
-  draw_line(-31, 142, -64, 132, true);
-  draw_line(-64, 132, -56, 166);
-
-  draw_line(0, 170, 30, 170, true);
-  draw_line(30, 170, 30, 140, true);
-  draw_line(30, 140, 0, 140, true);
-  draw_line(0, 140, 0, 170);
-
-
-  draw_circle(80, 151, 16);
-
-  draw_line(66.68, 142.14, 49.89, 124.55);
-  draw_line(81.06, 135.04, 81.01, 126.25);
-  draw_line(94.53, 144.3, 116.29, 132.85);
-  draw_line(92.88, 160.49, 109.02, 171.58);
-  draw_line(80.35, 167, 81.01, 183.69);
-  draw_line(66.53, 159.63, 51.62, 170.89);
-
-  delay(100);
-  go_to(25, 100);*/
-
-
-  // delay(1000);
-  // draw_circle(80, 151, 16);
-  // delay(1000);
-  // draw_circle(80, 151, 16);
-  // delay(1000);
-  // draw_circle(80, 151, 16);
-  // delay(1000);
-
-  delay(3000);
-  lift();
-  delay(3000);
-  put_down();
+  draw_circle(0, 150, 32);
+  draw_circle(25, 150, 32);
+  draw_circle(50, 150, 32);
   
 }
 
 void loop()
 {
   
-  /*
-  for (pos = 0; pos <= 90; pos += 10) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    servo1.write(pos);              // tell servo to go to position in variable 'pos'
-    Serial.println(pos);
-    delay(500);                       // waits 15ms for the servo to reach the position
-  }
-  for (pos = 90; pos >= 0; pos -= 10) { // goes from 180 degrees to 0 degrees
-    servo1.write(pos);              // tell servo to go to position in variable 'pos'
-    Serial.println(pos);
-    delay(500);                       // waits 15ms for the servo to reach the position
-  }
-  for (pos = 0; pos <= 90; pos += 10) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    servo2.write(pos);              // tell servo to go to position in variable 'pos'
-    Serial.println(pos);
-    delay(500);                       // waits 15ms for the servo to reach the position
-  }
-  for (pos = 90; pos >= 0; pos -= 10) { // goes from 180 degrees to 0 degrees
-    servo2.write(pos);              // tell servo to go to position in variable 'pos'
-    Serial.println(pos);
-    delay(500);                       // waits 15ms for the servo to reach the position
-  }*/
-
-  /*servo1.write(90);
-  servo2.write(90);
   delay(1000);
-  servo1.write(0);
-  servo2.write(0);
-  delay(1000);*/
   
 }
