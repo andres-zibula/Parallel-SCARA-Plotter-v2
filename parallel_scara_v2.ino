@@ -1,6 +1,5 @@
 #include <Arduino.h>
-//#include <math.h> //for Arduino
-//#include "hardware\\tools\\avr\\avr\\include\\math.h" //for other windows
+//#include <math.h> //for Arduino IDE
 #include "hardware/tools/avr/avr/include/math.h" //for vscode
 #include <Servo.h>
 
@@ -168,6 +167,8 @@ inline double pitagoras(double b, double c)
   return sqrt(b*b + c*c);
 }
 
+//for a better understanding take look at the following image:
+//https://github.com/andres-zibula/project-images/blob/master/parallel_scara_stylus/parallel_scara_stylus.jpeg
 void go_to(double x, double y)
 {
   if (actual_x == x && actual_y == y)
