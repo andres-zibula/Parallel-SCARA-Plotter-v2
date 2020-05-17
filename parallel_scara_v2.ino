@@ -195,12 +195,7 @@ void go_to(double x, double y)
   double s2deg = rad_to_deg(M_PI - theta2);
    
   servo1.write(s1deg + S1_OFFSET);
-  //Serial.print("servo1: ");
-  //Serial.println(floor(s1deg));
-
   servo2.write(s2deg + S2_OFFSET);
-  //Serial.print("servo2: ");
-  //Serial.println(floor(s2deg));
   
   double max_dist = max(abs(actual_s1_deg - s1deg), abs(actual_s2_deg - s2deg));
   int delay_servo = ceil(MS_PER_DEG*ceil(max_dist));
@@ -230,8 +225,6 @@ void setup()
   digitalWrite(DEBUG_LED_LIFTING, LOW);
   digitalWrite(DEBUG_LED_PUTTING_DOWN, LOW);
   digitalWrite(DEBUG_LED_LINE, LOW);
-
-  //Serial.begin(9600);
   
   servo1.attach(S1_PIN);
   servo2.attach(S2_PIN);
@@ -255,7 +248,5 @@ void setup()
 
 void loop()
 {
-  
   delay(1000);
-  
 }
